@@ -12,22 +12,25 @@ import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
 
+    var testPebble:Pebble? = nil
+    
+    @IBOutlet weak var messageText: UITextField!
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Set the view's delegate
-        sceneView.delegate = self
+        //sceneView.delegate = self
         
         // Show statistics such as fps and timing information
-        sceneView.showsStatistics = true
+        //sceneView.showsStatistics = true
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        //let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
         // Set the scene to the view
-        sceneView.scene = scene
+        //sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,15 +40,35 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let configuration = ARWorldTrackingConfiguration()
 
         // Run the view's session
-        sceneView.session.run(configuration)
+        //sceneView.session.run(configuration)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         // Pause the view's session
-        sceneView.session.pause()
+        //sceneView.session.pause()
     }
+    
+    @IBAction func plusPressed(_ sender: UIButton) {
+        if let msg = self.messageText{
+            save(message: msg.text!)
+            msg.text = ""
+        }
+    }
+    
+    @IBAction func editEnded(_ sender: UITextField) {
+        resignFirstResponder()
+    }
+    
+    func save(message: String) -> Void {
+        let currentTime = NSDate()
+        print("++++++++++Test++++++++++")
+        testPebble = Pebble(timeStamp: currentTime, message: message)
+        StorageFacade.sharedInstance.drop(this: testPebble!)
+    }
+    
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

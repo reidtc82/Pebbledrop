@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CloudKit
 
 class StorageFacade {
     static let sharedInstance = StorageFacade()
@@ -23,8 +24,9 @@ class StorageFacade {
         
     }
     
-    func drop(this pebble:Pebble)//do I need elevation separate from gps coords?
+    func drop(this pebble:Pebble)
     {
+        print("+++++++++++\(pebble.timeStamp) \(pebble.message)")
         
     }
 }

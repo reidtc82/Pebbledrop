@@ -9,7 +9,8 @@
 import Foundation
 
 struct Pebble {
-    var location: WorldCoordinate
-    var image: [Int] //Placeholder. Will probably need bytes or some other prebuilt image object
-    var timeStamp: time_value //No idea, will need to keep a time value for purging daily
+    //var location: WorldCoordinate
+   //var image: [Int] //Placeholder. Will probably need bytes or some other prebuilt image object
+    var timeStamp: NSDate //setting this to 
+    var message: String
 }
