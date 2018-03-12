@@ -9,13 +9,24 @@
 import UIKit
 import SceneKit
 import ARKit
+import CoreLocation
+import Photos
 
-class ViewController: UIViewController, ARSCNViewDelegate {
-
+class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    let locationManager = CLLocationManager()
+    let imagePickerController = UIImagePickerController()
+    
     var testPebble:Pebble? = nil
+    var location: CLLocation? = nil
+    var imageURL: NSURL!
+    
+    let documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
+    
+    let tempImageName = "temp_image.jpg"
     
     @IBOutlet weak var messageText: UITextField!
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var imageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +42,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         //sceneView.scene = scene
+        
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
+        
+        imagePickerController.delegate = self
+        checkPermission()
+        saveImageLocally()
+        imageView.isHidden = true
+        
+
+        StorageFacade.sharedInstance.getRecords(around: locationManager.location!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -41,6 +65,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
         // Run the view's session
         //sceneView.session.run(configuration)
+        
+        checkPermission()
+        saveImageLocally()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -49,8 +77,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         //sceneView.session.pause()
     }
-    
-    @IBAction func plusPressed(_ sender: UIButton) {
+
+    @IBAction func addPressed(_ sender: UIBarButtonItem) {
         if let msg = self.messageText{
             save(message: msg.text!)
             msg.text = ""
@@ -61,15 +89,118 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         resignFirstResponder()
     }
     
-    func save(message: String) -> Void {
-        let currentTime = NSDate()
-        print("++++++++++Test++++++++++")
-        testPebble = Pebble(timeStamp: currentTime, message: message)
-        StorageFacade.sharedInstance.drop(this: testPebble!)
+    @IBAction func pickPhoto(_ sender: UIBarButtonItem) {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.savedPhotosAlbum) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
+            imagePicker.allowsEditing = false
+            
+            present(imagePicker, animated: true, completion: nil)
+
+        }
     }
     
+    @IBAction func dismiss(sender: AnyObject) {
+        if let url = imageURL {
+            let fileManager = FileManager()
+            if fileManager.fileExists(atPath: url.absoluteString!) {
+                do {
+                    try fileManager.removeItem(at: url as URL)
+                    print("Success removing item")
+                } catch {
+                    print("error removing item")
+                }
+            }
+        }
+        
+        navigationController?.popViewController(animated: true)
+    }
     
+    @IBAction func trashImage(_ sender: UIBarButtonItem) {
+        imageView.image = nil
+        
+        imageView.isHidden = true
+    }
     
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            imageView.contentMode = UIViewContentMode.scaleAspectFill
+            imageView.image = pickedImage
+        }
+        
+        saveImageLocally()
+        
+        imageView.isHidden = false
+        //btnRemoveImage.hidden = false
+        //btnSelectPhoto.hidden = true
+        
+        dismiss(animated: true, completion: nil)
+        print("+++++++++++++Is the image hidden?++++++++++++++++++\(imageView.isHidden)")
+        print(imageView.image)
+    }
+    
+    func saveImageLocally() {
+        print("SAVING IMAGE LOCALLY")
+        let imageData: NSData = UIImageJPEGRepresentation(imageView.image!, 0.8)! as NSData
+        let path = documentsDirectoryPath.appendingPathComponent(tempImageName)
+        imageURL = NSURL(fileURLWithPath: path)
+        imageData.write(to: imageURL as URL, atomically: true)
+        print("IMAGE URL: \(imageURL)")
+    }
+    
+    func checkPermission() {
+        let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
+        switch photoAuthorizationStatus {
+        case .authorized:
+            print("Access is granted by user")
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization({
+                (newStatus) in
+                print("status is \(newStatus)")
+                if newStatus ==  PHAuthorizationStatus.authorized {
+                    /* do stuff here */
+                    print("success")
+                }
+            })
+            print("It is not determined until now")
+        case .restricted:
+            // same same
+            print("User do not have access to photo album.")
+        case .denied:
+            // same same
+            print("User has denied the permission.")
+        }
+    }
+    
+    func save(message: String) -> Void {
+        //let currentTime = NSDate()
+        print("++++++++++Test++++++++++")
+        if let imURL = imageURL {
+            testPebble = Pebble(message: message, locationOffset: 1, at: location!, imageURL: imURL, image: imageView.image!)
+            StorageFacade.sharedInstance.drop(this: testPebble!)
+            imageView.image = nil
+            imageView.isHidden = true
+        }else{
+            //let fileURL = Bundle.main.url(forResource: "no_image", withExtension: "png")
+            print("++++++++++++++++DEFAULT IMAGE++++++++++++++")
+            print("IMAGE DOESNT EXIST")
+            imageView.isHidden = true
+            return
+            //testPebble = Pebble(message: message, locationOffset: 1, at: location!, imageURL: imageURL)
+            //StorageFacade.sharedInstance.drop(this: testPebble!)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        location = locations[0]
+        print(location?.coordinate ?? "no location to print")
+    }
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Release any cached data, images, etc that aren't in use.

@@ -7,10 +7,22 @@
 //
 
 import Foundation
+import CoreLocation
+import UIKit
 
 struct Pebble {
-    //var location: WorldCoordinate
-   //var image: [Int] //Placeholder. Will probably need bytes or some other prebuilt image object
-    var timeStamp: NSDate //setting this to 
+    
     var message: String
+    var locationOffset: Int
+    var location: CLLocation
+    var imageURL: NSURL?
+    var image: UIImage
+    
+    init(message: String, locationOffset: Int, at location:CLLocation, imageURL: NSURL, image:UIImage){
+        self.message = message
+        self.locationOffset = locationOffset
+        self.location = location
+        self.imageURL = imageURL
+        self.image = image
+    }
 }
