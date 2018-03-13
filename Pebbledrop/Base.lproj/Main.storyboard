@@ -31,15 +31,22 @@
                                 </connections>
                             </textField>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="no_image" translatesAutoresizingMaskIntoConstraints="NO" id="U7U-Dm-Dne">
-                                <rect key="frame" x="0.0" y="70" width="375" height="455"/>
+                                <rect key="frame" x="0.0" y="70" width="375" height="100"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="Xbg-ZH-GUd"/>
+                                </constraints>
                             </imageView>
-                            <arscnView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NgW-cm-Gjh">
-                                <rect key="frame" x="0.0" y="333" width="375" height="0.0"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NgW-cm-Gjh">
+                                <rect key="frame" x="0.0" y="170" width="375" height="453"/>
                             </arscnView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vHq-dx-d3G">
                                 <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                                 <items>
+                                    <barButtonItem title="Item" id="wON-2g-OGa">
+                                        <connections>
+                                            <action selector="showResults:" destination="BV1-FR-VrT" id="d5O-q5-fnP"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="fVo-ZK-itx"/>
                                     <barButtonItem systemItem="camera" id="ugh-2B-xBU">
                                         <connections>
@@ -63,11 +70,14 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="NgW-cm-Gjh" firstAttribute="top" secondItem="U7U-Dm-Dne" secondAttribute="bottom" id="1kz-hH-UDI"/>
+                            <constraint firstItem="NgW-cm-Gjh" firstAttribute="bottom" secondItem="vHq-dx-d3G" secondAttribute="top" id="1qT-0u-jjb"/>
                             <constraint firstItem="U7U-Dm-Dne" firstAttribute="top" secondItem="iYL-vy-LNT" secondAttribute="bottom" id="EqU-MJ-6YV"/>
                             <constraint firstItem="U7U-Dm-Dne" firstAttribute="leading" secondItem="KU3-bu-Lwx" secondAttribute="leading" id="QzH-kT-f8v"/>
                             <constraint firstItem="U7U-Dm-Dne" firstAttribute="trailing" secondItem="KU3-bu-Lwx" secondAttribute="trailing" id="TIW-7M-XWp"/>
                             <constraint firstItem="iYL-vy-LNT" firstAttribute="top" secondItem="KU3-bu-Lwx" secondAttribute="top" id="VBs-Ne-cn0"/>
                             <constraint firstItem="vHq-dx-d3G" firstAttribute="bottom" secondItem="KU3-bu-Lwx" secondAttribute="bottom" id="aTx-sJ-JxE"/>
+                            <constraint firstItem="NgW-cm-Gjh" firstAttribute="width" secondItem="KU3-bu-Lwx" secondAttribute="width" id="ey3-Ow-IaO"/>
                             <constraint firstItem="iYL-vy-LNT" firstAttribute="width" secondItem="jRe-eH-Pbg" secondAttribute="width" constant="-40" id="g5W-64-K5Y"/>
                             <constraint firstItem="iYL-vy-LNT" firstAttribute="centerX" secondItem="KU3-bu-Lwx" secondAttribute="centerX" id="iyV-Q3-4LI"/>
                             <constraint firstItem="vHq-dx-d3G" firstAttribute="centerX" secondItem="KU3-bu-Lwx" secondAttribute="centerX" id="xJy-En-3Uh"/>
@@ -78,6 +88,7 @@
                     <connections>
                         <outlet property="imageView" destination="U7U-Dm-Dne" id="2jW-zt-Dno"/>
                         <outlet property="messageText" destination="iYL-vy-LNT" id="czU-YC-Iuj"/>
+                        <outlet property="sceneView" destination="NgW-cm-Gjh" id="xOz-qH-KoV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>

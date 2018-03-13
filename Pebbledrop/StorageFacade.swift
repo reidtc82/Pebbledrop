@@ -13,29 +13,35 @@ import UIKit
 class StorageFacade {
     static let sharedInstance = StorageFacade()
     let TWENTYFOURHOURS:Double = -60*60*24
+    var records:[CKRecord] = []
     
-    func getPebbles(around location:CLLocation) -> [Pebble] {
-        let records = getRecords(around: location)
-        var pebbles:[Pebble] = []
+    
+    func getPebbles() -> [Pebble] {
         
+        var pebbles:[Pebble] = []
+        print("!!!!!!!!\(records.count)")
+        let dummyURL = NSURL(fileURLWithPath: "")
         for rec in records {
-            let tempPebble = Pebble(message: rec.value(forKey: "message") as! String, locationOffset: 1, at: rec.value(forKey: "location") as! CLLocation, imageURL: NSURL(), image: rec.value(forKey: "image") as! UIImage)
+            print("IN PEBBLES \(rec.value(forKey: "message") ?? "NO MESSAGE!") ")
+            //image is coming back nil
+            let imageAsset: CKAsset = rec.value(forKey: "pebbleImage") as! CKAsset
+            let tempImage = UIImage(contentsOfFile: imageAsset.fileURL.path)
+
+            let tempPebble = Pebble(message: rec.value(forKey: "message") as! String, locationOffset: 1, at: rec.value(forKey: "location") as! CLLocation, imageURL: dummyURL, image: tempImage! )
             
             pebbles.append(tempPebble)
         }
         
-        
+        return pebbles
     }
     
-    func getRecords(around location:CLLocation) -> [CKRecord] {
+    func getRecords(around location:CLLocation) {
         let container = CKContainer.default()
         let privateDatabase = container.privateCloudDatabase
-        let radius = 100;
+        let radius = 100;//meters
         
         var predicateLoc:NSPredicate? = nil
         var predicateTime:NSPredicate? = nil
-        var records:[CKRecord] = []
-         //meters
         
         predicateLoc = NSPredicate(format: "distanceToLocation:fromLocation:(location, %@) < %f", location, radius)
         predicateTime  = NSPredicate(format: "creationDate > %@",NSDate(timeInterval: -86400, since: NSDate() as Date)) as NSPredicate
@@ -44,15 +50,17 @@ class StorageFacade {
         
         let query = CKQuery(recordType: "pebble", predicate: compound)
         
+        records = []
+        
         privateDatabase.perform(query, inZoneWith: nil) { (results, error) -> Void in
             if error != nil {
                 print(error ?? "didnt work")
             }
             else {
-                print("---------LOCAL PEBBLES--------")
-                print(results ?? "did work")
-                print("-------END LOCAL PEBBLES------")
-                print(NSDate(timeInterval: self.TWENTYFOURHOURS, since: NSDate() as Date))
+                //print("---------LOCAL PEBBLES--------")
+                //print(results ?? "did work")
+                //print("-------END LOCAL PEBBLES------")
+                //print(NSDate(timeInterval: self.TWENTYFOURHOURS, since: NSDate() as Date))
                 /**for result in results! {
                     self.arrNotes.append(result as! CKRecord)
                 }
@@ -61,10 +69,16 @@ class StorageFacade {
                     self.tblNotes.reloadData()
                     self.tblNotes.hidden = false
                 })**/
-                records = results!
+                
+                for result in results! {
+                    print("\n\n\n\n------this result \(result.value(forKey: "message") ?? "novalue")\n\n\n\n")
+                    self.records.append(result)
+                    print(self.records.count)
+                    //print(result.value(forKey: "image")) Im dumb its called pebbleImage
+                }
+                
             }
         }
-        return records
     }
     
     func drop(this pebble:Pebble)
