@@ -212,7 +212,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             locationManager.startUpdatingLocation()
             location = locationManager.location
         }
-        let tempDebug: String = "No Location I guess"
+        let tempDebug = CLLocation()
         print("INIT LOCATION AT \(callingFunc) \(location ?? tempDebug)")
         if let loc = location {
             StorageFacade.sharedInstance.getRecords(around: loc)

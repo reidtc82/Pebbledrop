@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BV1-FR-VrT">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FzM-QY-VdE">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -20,10 +20,10 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="no_image" translatesAutoresizingMaskIntoConstraints="NO" id="U7U-Dm-Dne">
-                                <rect key="frame" x="0.0" y="156" width="375" height="375"/>
+                                <rect key="frame" x="0.0" y="178" width="375" height="375"/>
                             </imageView>
                             <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NgW-cm-Gjh">
-                                <rect key="frame" x="0.0" y="20" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="559"/>
                             </arscnView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vHq-dx-d3G">
                                 <rect key="frame" x="0.0" y="623" width="375" height="44"/>
@@ -76,6 +76,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="KU3-bu-Lwx"/>
                     </view>
+                    <navigationItem key="navigationItem" id="Z4x-a2-Wgg"/>
                     <connections>
                         <outlet property="addButton" destination="h5O-ZT-zzq" id="MwE-br-PgG"/>
                         <outlet property="imageView" destination="U7U-Dm-Dne" id="2jW-zt-Dno"/>
@@ -95,6 +96,9 @@
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <connections>
+                        <segue destination="BV1-FR-VrT" kind="relationship" relationship="rootViewController" id="Gyz-tM-B4W"/>
+                    </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ECX-WC-Y4h" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
