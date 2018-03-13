@@ -25,9 +25,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     
     let tempImageName = "temp_image.jpg"
     
-    @IBOutlet weak var messageText: UITextField!
+    //@IBOutlet weak var messageText: UITextField!
+    let messageText: String = "Just a placeholder to save time fishing out all references. Got more importnt things to do."
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var trashButton: UIBarButtonItem!
+    @IBOutlet weak var addButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +60,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         checkPermission()
         saveImageLocally()
         imageView.isHidden = true
+        sceneView.isHidden = false
+        trashButton.isEnabled = false
+        addButton.isEnabled = false
 
         setPebs("ViewDidLoad")
     }
@@ -90,17 +96,24 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             var lastV:SCNVector3 = SCNVector3(0,Double(-1),0)
             
             print(pebs[0].image.size)
-            imageView.image = pebs[0].image
-            imageView.isHidden = false
-            imageView.contentMode = UIViewContentMode.scaleAspectFill
+            //imageView.image = pebs[0].image
+            //imageView.isHidden = false
+            //imageView.contentMode = UIViewContentMode.scaleAspectFill
             
             for peb in pebs {
-                let x = round(Double(peb.location.coordinate.latitude.distance(to: (location?.coordinate.latitude)!)))
+                let tempXCPeb = CLLocation(latitude: peb.location.coordinate.latitude, longitude: 0)
+                let tempZCPeb = CLLocation(latitude: 0, longitude: peb.location.coordinate.longitude)
+                let tempXCUser = CLLocation(latitude: (location?.coordinate.latitude)!, longitude: 0)
+                let tempZCUser = CLLocation(latitude: 0, longitude: (location?.coordinate.longitude)!)
+                
+                let x = tempXCPeb.distance(from: tempXCUser)
+                let z = tempZCPeb.distance(from: tempZCUser)
+                //let x = Double(peb.location.coordinate.latitude.distance(to: (location?.coordinate.latitude)!))
                 let y = Double(lastV.y)
-                let z = round(Double(peb.location.coordinate.longitude.distance(to: (location?.coordinate.longitude)!)))+1
-                //print("Im here \(location?.coordinate)")
-                //print("Youre there \(peb.location.coordinate)")
-                //print("Our difference \(x),\(z)")
+                //let z = Double(peb.location.coordinate.longitude.distance(to: (location?.coordinate.longitude)!))+1
+                
+                
+                
                 var tempV = SCNVector3(x,y,-z)
                 if tempV.x <= lastV.x+1 && tempV.x >= lastV.x-1 && tempV.z <= lastV.z+1 && tempV.z >= lastV.z-1 {
                     tempV.y += 0.6
@@ -117,10 +130,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     }
     
     @IBAction func addPressed(_ sender: UIBarButtonItem) {
-        if let msg = self.messageText{
-            save(message: msg.text!)
-            msg.text = ""
-        }
+        save(message: messageText)
+        imageView.isHidden = true
+        sceneView.isHidden = false
+        addButton.isEnabled = false
+        trashButton.isEnabled = false
+        //msg.text = ""
     }
     
     @IBAction func editEnded(_ sender: UITextField) {
@@ -136,6 +151,18 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             
             present(imagePicker, animated: true, completion: nil)
 
+        }
+    }
+    
+    @IBAction func takePhoto(_ sender: UIBarButtonItem) {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.savedPhotosAlbum) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.camera
+            imagePicker.allowsEditing = false
+            
+            present(imagePicker, animated: true, completion: nil)
+            
         }
     }
     
@@ -157,8 +184,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     
     @IBAction func trashImage(_ sender: UIBarButtonItem) {
         imageView.image = nil
-        
         imageView.isHidden = true
+        sceneView.isHidden = false
+        trashButton.isEnabled = false
+        addButton.isEnabled = false
     }
     
     func createLivePebble(at position : SCNVector3, texture: UIImage){
@@ -170,7 +199,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             pebbleShape.materials.insert(pebbleMaterial, at: i)
         }
         
-        print("PEBBLE MATERIALS\(pebbleShape.materials.count) \(pebbleShape.materials[0]) \(pebbleShape.materials[1])")
+        //print("PEBBLE MATERIALS\(pebbleShape.materials.count) \(pebbleShape.materials[0]) \(pebbleShape.materials[1])")
         
         let pebbleNode = SCNNode(geometry: pebbleShape)
         pebbleNode.position = position
@@ -205,8 +234,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         saveImageLocally()
         
         imageView.isHidden = false
-        //btnRemoveImage.hidden = false
-        //btnSelectPhoto.hidden = true
+        sceneView.isHidden = true
+        trashButton.isEnabled = true
+        addButton.isEnabled = true
         
         dismiss(animated: true, completion: nil)
         //print("+++++++++++++Is the image hidden?++++++++++++++++++\(imageView.isHidden)")
@@ -259,6 +289,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
                 StorageFacade.sharedInstance.drop(this: testPebble!)
                 imageView.image = nil
                 imageView.isHidden = true
+                sceneView.isHidden = false
             }
         }else{
             //let fileURL = Bundle.main.url(forResource: "no_image", withExtension: "png")

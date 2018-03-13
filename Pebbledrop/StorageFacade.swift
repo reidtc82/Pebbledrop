@@ -37,7 +37,7 @@ class StorageFacade {
     
     func getRecords(around location:CLLocation) {
         let container = CKContainer.default()
-        let privateDatabase = container.privateCloudDatabase
+        let privateDatabase = container.publicCloudDatabase
         let radius = 10000;//meters
         
         var predicateLoc:NSPredicate? = nil
@@ -98,11 +98,12 @@ class StorageFacade {
         noteRecord.setObject(imageAsset, forKey: "pebbleImage")
         
         let container = CKContainer.default()
-        let publicDatabase = container.privateCloudDatabase //Ah I did set it up as private. Make sure this is changed for final release.
+        let publicDatabase = container.publicCloudDatabase //Ah I did set it up as private. Make sure this is changed for final release.
         
         publicDatabase.save(noteRecord, completionHandler: { (record, error) -> Void in
             if (error != nil) {
                 print(error ?? "There was an error")//I wonder why it didnt error
+                //throw DataBaseError(error)
             }//have an else to set a timeout for posting more within a few seconds. Dont wnt spam and probably also want some sort of confirmation
         })
     }

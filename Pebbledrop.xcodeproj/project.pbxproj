@@ -20,6 +20,7 @@
 		B40B8349203F8698004335B8 /* WorldCoordinate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40B8348203F8698004335B8 /* WorldCoordinate.swift */; };
 		B40B834B203F872F004335B8 /* Pebble.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40B834A203F872F004335B8 /* Pebble.swift */; };
 		B46099232055F6060020B894 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B46099222055F6060020B894 /* CoreLocation.framework */; };
+		B4A77C0E205885BF001F793C /* DataBaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A77C0D205885BF001F793C /* DataBaseError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,7 @@
 		B40B8348203F8698004335B8 /* WorldCoordinate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldCoordinate.swift; sourceTree = "<group>"; };
 		B40B834A203F872F004335B8 /* Pebble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pebble.swift; sourceTree = "<group>"; };
 		B46099222055F6060020B894 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		B4A77C0D205885BF001F793C /* DataBaseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 		B40B8306203F68E1004335B8 = {
 			isa = PBXGroup;
 			children = (
+				B4A77C0D205885BF001F793C /* DataBaseError.swift */,
 				B40B8311203F68E1004335B8 /* Pebbledrop */,
 				B40B8328203F68E1004335B8 /* PebbledropTests */,
 				B40B8333203F68E1004335B8 /* PebbledropUITests */,
@@ -299,6 +302,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B40B8349203F8698004335B8 /* WorldCoordinate.swift in Sources */,
+				B4A77C0E205885BF001F793C /* DataBaseError.swift in Sources */,
 				B40B8317203F68E1004335B8 /* ViewController.swift in Sources */,
 				B40B8347203F836D004335B8 /* StorageFacade.swift in Sources */,
 				B40B8313203F68E1004335B8 /* AppDelegate.swift in Sources */,
