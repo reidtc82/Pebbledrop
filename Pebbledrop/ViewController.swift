@@ -212,7 +212,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             locationManager.startUpdatingLocation()
             location = locationManager.location
         }
-        print("INIT LOCATION AT \(callingFunc) \(location)")
+        let tempDebug: String = "No Location I guess"
+        print("INIT LOCATION AT \(callingFunc) \(location ?? tempDebug)")
         if let loc = location {
             StorageFacade.sharedInstance.getRecords(around: loc)
             pebs = StorageFacade.sharedInstance.getPebbles()
