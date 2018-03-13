@@ -125,6 +125,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             }
             //let newTempV = SCNVector3(10,0,5)
             //createLivePebble(at: newTempV, texture: imageView.image!)
+        }else{
+            let alertController = UIAlertController(title: "Pebbles Loading", message:
+                "So Sorry! We're still loading pebbles. They're kind of heavy, so it may take a while for them to appear. Try again in a few seconds or begin by dropping your own pebble.", preferredStyle: UIAlertControllerStyle.alert)
+            
+            alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+            
+            self.present(alertController, animated: true, completion: nil)
         }
         
     }
@@ -151,17 +158,32 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             
             present(imagePicker, animated: true, completion: nil)
 
+        }else{
+            let alertController = UIAlertController(title: "No Photo Library", message:
+                "Your library is disabled or doesn't exist. Please correct before using this feature.", preferredStyle: UIAlertControllerStyle.alert)
+            
+            alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+            
+            self.present(alertController, animated: true, completion: nil)
         }
     }
     
     @IBAction func takePhoto(_ sender: UIBarButtonItem) {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.savedPhotosAlbum) {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
             let imagePicker = UIImagePickerController()
             imagePicker.delegate = self
             imagePicker.sourceType = UIImagePickerControllerSourceType.camera
             imagePicker.allowsEditing = false
             
             present(imagePicker, animated: true, completion: nil)
+            
+        }else{
+            let alertController = UIAlertController(title: "No Camera", message:
+                "Your camera is disabled or doesn't exist. Please correct before using this feature.", preferredStyle: UIAlertControllerStyle.alert)
+            
+            alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+            
+            self.present(alertController, animated: true, completion: nil)
             
         }
     }
@@ -220,6 +242,14 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         }
         print("+++++++++++++++PEBBLES++++++++++++++++++")
         print(pebs.count)
+        if pebs.count == 0 {
+            let alertController = UIAlertController(title: "Pebbles Loading", message:
+                "So Sorry! We're still loading pebbles. They're kind of heavy, so it may take a while for them to appear. Try again in a few seconds or begin by dropping your own pebble.", preferredStyle: UIAlertControllerStyle.alert)
+            
+            alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+            
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
