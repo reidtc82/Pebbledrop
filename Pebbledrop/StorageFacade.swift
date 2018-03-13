@@ -38,7 +38,7 @@ class StorageFacade {
     func getRecords(around location:CLLocation) {
         let container = CKContainer.default()
         let privateDatabase = container.privateCloudDatabase
-        let radius = 100;//meters
+        let radius = 10000;//meters
         
         var predicateLoc:NSPredicate? = nil
         var predicateTime:NSPredicate? = nil
@@ -70,12 +70,10 @@ class StorageFacade {
                     self.tblNotes.hidden = false
                 })**/
                 
-                for result in results! {
-                    print("\n\n\n\n------this result \(result.value(forKey: "message") ?? "novalue")\n\n\n\n")
-                    self.records.append(result)
-                    print(self.records.count)
+                //print("\n\n\n\n------this result \(results.value(forKey: "message") ?? "novalue")\n\n\n\n")
+                self.records = results!
+                    print("INCOMING RECORDS \(self.records.count)")
                     //print(result.value(forKey: "image")) Im dumb its called pebbleImage
-                }
                 
             }
         }

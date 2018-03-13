@@ -45,6 +45,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         sceneView.scene = scene
         //sceneView.scene.background.contents = imageView.image
         
+        //let testPos = SCNVector3(0,-1,-1)
+        //createLivePebble(at: testPos, texture: imageView.image!)
+        
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
@@ -55,7 +58,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         saveImageLocally()
         imageView.isHidden = true
 
-        setPebs()
+        setPebs("ViewDidLoad")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,23 +72,48 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         
         checkPermission()
         saveImageLocally()
-        setPebs()
+        setPebs("viewWillAppear")
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         // Pause the view's session
-        //sceneView.session.pause()
+        sceneView.session.pause()
     }
     
     @IBAction func showResults(_ sender: UIBarButtonItem) {
         print("PEBS!!!!!!!!!!!!")
+        
         pebs = StorageFacade.sharedInstance.getPebbles()
-        print(pebs[0].image.size)
-        imageView.image = pebs[0].image
-        imageView.isHidden = true
-        imageView.contentMode = UIViewContentMode.scaleAspectFill
+        if pebs.count > 0 {
+            var lastV:SCNVector3 = SCNVector3(0,Double(-1),0)
+            
+            print(pebs[0].image.size)
+            imageView.image = pebs[0].image
+            imageView.isHidden = false
+            imageView.contentMode = UIViewContentMode.scaleAspectFill
+            
+            for peb in pebs {
+                let x = round(Double(peb.location.coordinate.latitude.distance(to: (location?.coordinate.latitude)!)))
+                let y = Double(lastV.y)
+                let z = round(Double(peb.location.coordinate.longitude.distance(to: (location?.coordinate.longitude)!)))+1
+                //print("Im here \(location?.coordinate)")
+                //print("Youre there \(peb.location.coordinate)")
+                //print("Our difference \(x),\(z)")
+                var tempV = SCNVector3(x,y,-z)
+                if tempV.x <= lastV.x+1 && tempV.x >= lastV.x-1 && tempV.z <= lastV.z+1 && tempV.z >= lastV.z-1 {
+                    tempV.y += 0.6
+                }
+                
+                createLivePebble(at: tempV, texture: peb.image)
+                
+                lastV = tempV
+            }
+            //let newTempV = SCNVector3(10,0,5)
+            //createLivePebble(at: newTempV, texture: imageView.image!)
+        }
+        
     }
     
     @IBAction func addPressed(_ sender: UIBarButtonItem) {
@@ -134,32 +162,34 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     }
     
     func createLivePebble(at position : SCNVector3, texture: UIImage){
-        var pebbleShape = SCNBox(width: 1, height: 1, length: 1, chamferRadius: 0)
-        var pebbleMaterial = SCNMaterial()
+        let pebbleShape = SCNBox(width: 0.5, height: 0.5, length: 0.5, chamferRadius: 0)
+        let pebbleMaterial = SCNMaterial()
         pebbleMaterial.diffuse.contents = texture
-        pebbleShape.materials.append(pebbleMaterial)
+        //pebbleShape.materials.append(pebbleMaterial)
+        for i in 0...5 {
+            pebbleShape.materials.insert(pebbleMaterial, at: i)
+        }
         
-        var pebbleNode = SCNNode(geometry: pebbleShape)
+        print("PEBBLE MATERIALS\(pebbleShape.materials.count) \(pebbleShape.materials[0]) \(pebbleShape.materials[1])")
+        
+        let pebbleNode = SCNNode(geometry: pebbleShape)
+        pebbleNode.position = position
         sceneView.scene.rootNode.addChildNode(pebbleNode)
+        print("created node \(pebbleNode.position)")
     }
     
-    func setPebs() {
+    func setPebs(_ callingFunc: String) {
+        if location == nil {
+            locationManager.startUpdatingLocation()
+            location = locationManager.location
+        }
+        print("INIT LOCATION AT \(callingFunc) \(location)")
         if let loc = location {
             StorageFacade.sharedInstance.getRecords(around: loc)
             pebs = StorageFacade.sharedInstance.getPebbles()
         }
         print("+++++++++++++++PEBBLES++++++++++++++++++")
-        print(StorageFacade.sharedInstance.getPebbles().count)
-        
-        let userPosition = location?.coordinate
-        let userOrientation = location?.course
-        for peb in pebs {
-            let pebX = peb.location.coordinate.latitude - (userPosition?.latitude)!
-            let pebZ = peb.location.coordinate.longitude - (userPosition?.longitude)!+20
-            
-            let pebPos = SCNVector3(pebX,0,pebZ)
-            createLivePebble(at: pebPos, texture: peb.image)
-        }
+        print(pebs.count)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -184,12 +214,14 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     }
     
     func saveImageLocally() {
-        print("SAVING IMAGE LOCALLY")
-        let imageData: NSData = UIImageJPEGRepresentation(imageView.image!, 0.8)! as NSData
-        let path = documentsDirectoryPath.appendingPathComponent(tempImageName)
-        imageURL = NSURL(fileURLWithPath: path)
-        imageData.write(to: imageURL as URL, atomically: true)
-        print("IMAGE URL: \(imageURL)")
+        if let img = imageView.image {
+            print("SAVING IMAGE LOCALLY")
+            let imageData: NSData = UIImageJPEGRepresentation(img, 0.8)! as NSData
+            let path = documentsDirectoryPath.appendingPathComponent(tempImageName)
+            imageURL = NSURL(fileURLWithPath: path)
+            imageData.write(to: imageURL as URL, atomically: true)
+            print("IMAGE URL: \(imageURL)")
+        }
     }
     
     func checkPermission() {
@@ -220,10 +252,14 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         //let currentTime = NSDate()
         print("++++++++++Test++++++++++")
         if let imURL = imageURL {
-            testPebble = Pebble(message: message, locationOffset: 1, at: location!, imageURL: imURL, image: imageView.image!)
-            StorageFacade.sharedInstance.drop(this: testPebble!)
-            imageView.image = nil
-            imageView.isHidden = true
+            if let tempLoc = location {
+                let newCoord = CLLocationCoordinate2DMake(tempLoc.coordinate.latitude, tempLoc.coordinate.longitude)
+                let newLoc = CLLocation(coordinate: newCoord, altitude: tempLoc.altitude, horizontalAccuracy: tempLoc.horizontalAccuracy, verticalAccuracy: tempLoc.verticalAccuracy, timestamp: tempLoc.timestamp)
+                testPebble = Pebble(message: message, locationOffset: 1, at: newLoc, imageURL: imURL, image: imageView.image!)
+                StorageFacade.sharedInstance.drop(this: testPebble!)
+                imageView.image = nil
+                imageView.isHidden = true
+            }
         }else{
             //let fileURL = Bundle.main.url(forResource: "no_image", withExtension: "png")
             print("++++++++++++++++DEFAULT IMAGE++++++++++++++")
@@ -237,8 +273,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations[0]
-        setPebs()
-        print(location?.coordinate ?? "no location to print")
+        //setPebs()
+        //print(location?.coordinate ?? "no location to print")
     }
 
     override func didReceiveMemoryWarning() {
