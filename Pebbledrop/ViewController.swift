@@ -101,27 +101,32 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
             //imageView.contentMode = UIViewContentMode.scaleAspectFill
             
             for peb in pebs {
-                let tempXCPeb = CLLocation(latitude: peb.location.coordinate.latitude, longitude: 0)
-                let tempZCPeb = CLLocation(latitude: 0, longitude: peb.location.coordinate.longitude)
-                let tempXCUser = CLLocation(latitude: (location?.coordinate.latitude)!, longitude: 0)
-                let tempZCUser = CLLocation(latitude: 0, longitude: (location?.coordinate.longitude)!)
+                let tempLocForRange = peb.location.distance(from: location!)
+                if tempLocForRange <= 25 {
+                    print("ARE WE MAKING A PEBBLE?")
+                    
+                    let tempXCPeb = CLLocation(latitude: peb.location.coordinate.latitude, longitude: 0)
+                    let tempZCPeb = CLLocation(latitude: 0, longitude: peb.location.coordinate.longitude)
+                    let tempXCUser = CLLocation(latitude: (location?.coordinate.latitude)!, longitude: 0)
+                    let tempZCUser = CLLocation(latitude: 0, longitude: (location?.coordinate.longitude)!)
                 
-                let x = tempXCPeb.distance(from: tempXCUser)
-                let z = tempZCPeb.distance(from: tempZCUser)
-                //let x = Double(peb.location.coordinate.latitude.distance(to: (location?.coordinate.latitude)!))
-                let y = Double(lastV.y)
-                //let z = Double(peb.location.coordinate.longitude.distance(to: (location?.coordinate.longitude)!))+1
+                    let x = tempXCPeb.distance(from: tempXCUser)
+                    let z = tempZCPeb.distance(from: tempZCUser)
+                    //let x = Double(peb.location.coordinate.latitude.distance(to: (location?.coordinate.latitude)!))
+                    let y = Double(lastV.y)
+                    //let z = Double(peb.location.coordinate.longitude.distance(to: (location?.coordinate.longitude)!))+1
                 
+                    var tempV = SCNVector3(x,y,-z)
+                    if tempV.x <= lastV.x+1 && tempV.x >= lastV.x-1 && tempV.z <= lastV.z+1 && tempV.z >= lastV.z-1 {
+                        tempV.y += 0.6
+                    }
                 
+                    createLivePebble(at: tempV, texture: peb.image)
                 
-                var tempV = SCNVector3(x,y,-z)
-                if tempV.x <= lastV.x+1 && tempV.x >= lastV.x-1 && tempV.z <= lastV.z+1 && tempV.z >= lastV.z-1 {
-                    tempV.y += 0.6
+                    lastV = tempV
+                }else{
+                    print("PEBBLE TOO FAR AWAY \(peb.location.distance(from: location!))")
                 }
-                
-                createLivePebble(at: tempV, texture: peb.image)
-                
-                lastV = tempV
             }
             //let newTempV = SCNVector3(10,0,5)
             //createLivePebble(at: newTempV, texture: imageView.image!)
@@ -225,8 +230,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, CLLocationManagerDele
         
         let pebbleNode = SCNNode(geometry: pebbleShape)
         pebbleNode.position = position
+        
         sceneView.scene.rootNode.addChildNode(pebbleNode)
         print("created node \(pebbleNode.position)")
+    
     }
     
     func setPebs(_ callingFunc: String) {
